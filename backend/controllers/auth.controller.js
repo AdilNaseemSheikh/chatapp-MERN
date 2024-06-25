@@ -41,7 +41,7 @@ exports.login = async (req, res, next) => {
         const user = await User.findOne({ username })
         const isPasswordCorrect = await bcrypt.compare(password, user?.password || "")
 
-        if (!user || !isPasswordCorrect) return res.status().json({
+        if (!user || !isPasswordCorrect) return res.status(401).json({
             status: 'failed',
             message: 'Invalid username or password'
         })
@@ -52,10 +52,9 @@ exports.login = async (req, res, next) => {
             user
         })
     } catch (error) {
-        console.log(`💣 --> `, error.message);
+        console.log(`💣 --> `, error);
         res.status(500).json({ status: 'failed', message: 'Something went wrong' })
     }
-
 }
 
 exports.logout = async (req, res, next) => {
