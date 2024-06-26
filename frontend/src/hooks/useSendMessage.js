@@ -20,8 +20,7 @@ function useSendMessage() {
             if (data.status !== 'success') {
                 throw new Error(data.message || 'Something went wrong')
             }
-
-            setMessages({ ...messages, message: data.message })
+            setMessages([...messages, data.message])
 
         } catch (error) {
             toast.error()

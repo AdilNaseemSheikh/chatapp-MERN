@@ -1,34 +1,24 @@
-import { useState } from 'react'
-import toast from 'react-hot-toast';
-import { useAuthContext } from '../context/AuthContext';
+import { useEffect } from 'react';
+import { useSocketContext } from '../context/SocketContext';
+import useConversation from '../zustand/useConversations';
+import notification from '../assets/sounds/notification.mp3'
 
-function useSendMessage() {
-    const [loading, setLoading] = useState(false);
-    const { setAuthUser } = useAuthContext()
+function useListenMessages() {
+    const { socket } = useSocketContext();
+    const { messages, setMessages } = useConversation(state => state)
 
-    const send = async () => {
-        try {
-            const res = await fetch('http://localhost:8000/api/', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({}),
-                credentials: "include",
-            })
+    useEffect(() => {
+        socket?.on('newMessage', (newMessage) => {
+            newMessage.shouldShake = true;
+            const sound = new Audio(notification);
+            sound.play();
+            setMessages([...messages, newMessage])
+        })
 
-            const data = await res.json()
-            if (data.status !== 'success') {
-                throw new Error(data.message || 'Something went wrong')
-            }
-            localStorage.removeItem('chat-user');
-            setAuthUser(null)
-        } catch (error) {
-            toast.error()
-        } finally {
-            setLoading(false)
+        return () => {
+            socket.off('newMessage')
         }
-    }
-
-    return { loading, send }
+    }, [setMessages, messages, socket])
 }
 
-export default useSendMessage;
+export default useListenMessages;

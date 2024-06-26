@@ -1,5 +1,6 @@
 const Conversation = require("../models/conversation.model")
-const Message = require("../models/message.model")
+const Message = require("../models/message.model");
+const { getReceiverSocketId, io } = require("../socket/socket");
 
 exports.getMessages = async (req, res, next) => {
 
@@ -54,8 +55,14 @@ exports.sendMessage = async (req, res, next) => {
             conversation.messages = [];
         }
         conversation.messages.push(newMessage._id);
+
         await conversation.save()
-        // Save the updated conversation (if necessary, depending on your schema)
+
+        const receiverSocketId = getReceiverSocketId(receiverId);
+
+        if (receiverSocketId) {
+            io.to(receiverSocketId).emit('newMessage', newMessage) // .to is used to send message to a specific client
+        }
 
         res.status(200).json({
             status: 'success',

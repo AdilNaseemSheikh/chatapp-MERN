@@ -7,9 +7,10 @@ function Message({ msg }) {
   const { selectedConversation } = useConversation((state) => state);
   const isMe = msg.senderId === authUser.user._id;
   const formattedTime = extractTime(msg.createdAt);
+  const shouldShake = msg?.shouldShake;
 
   return (
-    <div className={`chat ${isMe ? "chat-start" : "chat-end"}`}>
+    <div className={`chat ${isMe ? "chat-end" : "chat-start"}`}>
       <div className="chat-image avatar">
         <div className="w-10 rounded-full">
           <img
@@ -21,7 +22,9 @@ function Message({ msg }) {
         </div>
       </div>
       <div
-        className={`chat-bubble text-white pb-2 ${isMe ? "" : "bg-blue-500"}`}
+        className={`chat-bubble text-white pb-2 ${isMe ? "" : "bg-blue-500"} ${
+          shouldShake && "shake"
+        } `}
       >
         {msg.message}
       </div>
