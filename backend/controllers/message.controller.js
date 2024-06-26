@@ -13,9 +13,9 @@ exports.getMessages = async (req, res, next) => {
             participants: { $all: [senderId, userToId] }
         }).populate('messages');
 
-        if (!conversation) res.status(200).json({
+        if (!conversation) return res.status(200).json({
             status: 'success',
-            conversation: []
+            messages: []
         });
 
         res.status(200).json({
