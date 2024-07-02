@@ -41,3 +41,24 @@ server.listen(port, async () => {
     await connect()
     console.log(`Server is running on port ${port}...`);
 })
+
+
+process.on('unhandledRejection', (err) => {
+    console.log('UNHANDLED REJECTION. Shutting down...');
+    console.log('💣', err, '💣');
+    server.close(() => {
+        // give server some time to finishe its ongoing request and then exit the application
+        // exit the application
+        process.exit(1);
+    });
+});
+
+// heroku every 24 hrs shut down our application by sending SIGTERM signal
+// we listen to this signal and quit server gracefully(wait for all pending requests to finish)
+process.on('SIGTERM', (err) => {
+    console.log('👋 SIGTERM RECEIVED. Shutting down...');
+
+    server.close(() => {
+        console.log('Process Terminated.');
+    });
+});

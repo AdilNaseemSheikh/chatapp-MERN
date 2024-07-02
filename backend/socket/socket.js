@@ -1,6 +1,13 @@
 const { Server } = require('socket.io')
 const http = require('http')
-const express = require('express')
+const express = require('express');
+
+process.on('uncaughtException', (err) => {
+    console.log('UNCAUGHT EXCEPTION. Shutting down...');
+    console.log('💣', err, '💣');
+
+    process.exit(1);
+});
 
 const app = express()
 
